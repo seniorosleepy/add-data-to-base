@@ -10,14 +10,19 @@ import (
 )
 
 type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+	ID       int    `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+type Answer struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 var db *sql.DB
 
-// Универсальный middleware CORS
 func withCors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
@@ -33,6 +38,40 @@ func withCors(next http.Handler) http.Handler {
 	})
 }
 
+func chekUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var a Answer
+
+	if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
+		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	var exists bool
+
+	err := db.QueryRow(
+		"SELECT EXISTS(SELECT 1 FROM accounts WHERE email = $1 AND password = $2)",
+		a.Email, a.Password,
+	).Scan(&exists)
+
+	if err != nil {
+		http.Error(w, "database error", 500)
+		return
+	}
+
+	if exists {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("User exist"))
+	} else {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+	}
+
+}
+
 func createUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -45,40 +84,13 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := db.Exec("INSERT INTO users (name, age) VALUES ($1, $2)", u.Name, u.Age)
+	_, err := db.Exec("INSERT INTO accounts (username, password, email) VALUES ($1, $2, $3)", u.Username, u.Password, u.Email)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
 	w.Write([]byte("user created"))
-}
-
-func getUsers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	rows, err := db.Query("SELECT id, name, age FROM users")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	defer rows.Close()
-
-	var users []User
-	for rows.Next() {
-		var u User
-		if err := rows.Scan(&u.ID, &u.Name, &u.Age); err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		users = append(users, u)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
 }
 
 func main() {
@@ -93,10 +105,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS accounts (
 		id SERIAL PRIMARY KEY,
-		name TEXT,
-		age INT
+		username TEXT,
+		password TEXT,
+		email TEXT
 	)`)
 	if err != nil {
 		log.Fatal(err)
@@ -104,7 +117,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", createUser)
-	mux.HandleFunc("/list", getUsers)
+	mux.HandleFunc("/check", chekUser)
 
 	// Оборачиваем весь mux в CORS middleware
 	log.Println("Server started on :8080")

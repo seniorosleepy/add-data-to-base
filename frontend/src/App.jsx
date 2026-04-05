@@ -1,54 +1,22 @@
 import { useState } from "react";
+import RegisterPage from "./components/RegisterPage";
+import LogInPage from "./components/LogInPage";
+import MainPage from "./components/MainPage";
 
 function App() {
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
+  const [page, setPage] = useState("login");
 
-  const createUser = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, age: parseInt(age, 10) }),
-      });
+  const PAGES = {
+    LOGIN: "login",
+    REGISTER: "register",
+    MAIN: "main",
+  }
 
-      if (response.ok) {
-        alert("User created successfully!");
-        setName("");
-        setAge("");
-        getUsers(); // обновляем список после создания пользователя
-      } else {
-        const text = await response.text();
-        alert("Error: " + text);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Network error");
-    }
-  };
+  if (page === PAGES.LOGIN) return <LogInPage setPage={setPage} />;
+  if (page === PAGES.REGISTER) return <RegisterPage setPage={setPage} />;
+  if (page === PAGES.MAIN) return <MainPage/>;
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h2>Create User</h2>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
-        style={{ marginRight: "10px" }}
-      />
-      <input
-        type="number"
-        value={age}
-        onChange={(e) => setAge(e.target.value)}
-        placeholder="Age"
-        style={{ marginRight: "10px" }}
-      />
-      <button onClick={createUser}>Create User</button>
-    </div>
-  );
+  return <div>Unknown Page</div>;
 }
 
 export default App;

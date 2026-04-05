@@ -1,63 +1,165 @@
-body{
-    margin: 0;
+:root {
+  --main-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.main-title{
-    margin: 0;
-    font-size: 80px;
+* {
+  padding: 0;
+  margin: 0;
+  font-family: "Sansation";
 }
 
-.header-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 100px;
-    background-color: rgb(107, 107, 107);
-    margin-bottom: 30px;
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url("/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.header-part{
-    display: flex;
-    gap: 10px;
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image: url("/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  z-index: -1;
 }
 
-.product-card{
-    width: 300px;
-    margin-inline: 30px;
+.login-container, .register-container {
+  width: 853px;
+  height: 515px;
+  border-radius: 30px;
+  background-color: #3b3c43;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  box-shadow: var(--main-shadow);
 }
 
-.card-image{
-    width: 300px;
-    border-radius: 20px;
+.register-container{
+    width: 580px;
+    height: 670px;
 }
 
-.price{
-    font-size:23px;
-    height: 30px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+h2 {
+  color: white;
+  font-size: 32px;
 }
 
-.to-card{
-    width: 100%;
-    border: none;
-    height: 50px;
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+input {
+  width: 390px;
+  height: 46px;
+  color: white;
+  background-color: #35353c;
+  border: 1px solid #5e5e5e;
+  border-radius: 13px;
+  font-size: 30px;
+  padding-left: 10px;
+  padding-bottom: 2px;
+  box-shadow: var(--main-shadow);
+}
+
+button {
+  width: 406px;
+  height: 48px;
+  border-radius: 18px;
+  font-size: 26px;
+  background-color: #276acd;
+  color: white;
+  border: none;
+  box-shadow: var(--main-shadow);
+}
+
+.input-title {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+h3 {
+  color: white;
+  font-size: 24px;
+}
+
+p {
+  color: white;
+  font-size: 21px;
+}
+
+.link {
+  color: #5696f5;
+}
+
+.link:hover,
+button {
+  cursor: pointer;
+}
+
+.erorr{
+    color: rgba(255, 0, 0, 0.637);
+}
+
+@media (max-width: 1024px) {
+  .login-container{
+    width: 560px;
+    height: 580px;
+    gap: 35px;
+  }
+
+  .register-container{
+    width: 530px;
+    height: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-container{
+    width: 450px;
+    height: 500px;
+  }
+
+}
+
+@media (max-width: 476px) {
+  .login-container{
+    width: 450px;
+    height: 500px;
+    gap: 30px;
+  }
+
+  .register-container{
+    width: 400px;
+    height: 500px;
+  }
+
+  h2{
+    font-size: 30px;
+  }
+
+  h3{
     font-size: 22px;
-    background-color: hotpink;
-    border-radius: 15px;
-}
+  }
 
-.to-card:hover{
-    cursor: pointer;
-}
+  input, button{
+    width: 350px;
+  }
 
-.to-card:active{
-    background-color: rgb(220, 20, 187);
-}
-
-.cards-container{
-    display: flex;
-    justify-content: center;
+  p{
+    font-size: 19px;
+  }
 }
